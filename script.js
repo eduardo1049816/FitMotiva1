@@ -3,27 +3,46 @@ let metas = [];
 let pontos = 0;
 
 // ==========================
+// 🔥 MANTER LOGIN
+// ==========================
+window.onload = function(){
+  const user = localStorage.getItem('currentUser');
+
+  if(user){
+    currentUser = user;
+
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+
+    document.getElementById('welcomeUser').innerText =
+      "Seja bem-vindo, " + user + "!";
+
+    loadUserData();
+  }
+}
+
+// ==========================
 // 🔔 NOTIFICAÇÕES
 // ==========================
-
-// pedir permissão
 function pedirPermissao(){
-  if(Notification.permission !== "granted"){
+  if("Notification" in window && Notification.permission !== "granted"){
     Notification.requestPermission();
   }
 }
 
-// enviar notificação
 function notificar(titulo, mensagem){
-  if(Notification.permission === "granted"){
-    new Notification(titulo, {
-      body: mensagem,
-      icon: "https://cdn-icons-png.flaticon.com/512/1048/1048953.png"
-    });
+  if("Notification" in window && Notification.permission === "granted"){
+    try{
+      new Notification(titulo, {
+        body: mensagem,
+        icon: "https://cdn-icons-png.flaticon.com/512/1048/1048953.png"
+      });
+    }catch(e){
+      console.log("Notificação não suportada");
+    }
   }
 }
 
-// botão de teste
 function testarNotificacao(){
   notificar("FitMotiva 💪", "Essa é uma notificação de teste!");
 }
@@ -31,7 +50,6 @@ function testarNotificacao(){
 // ==========================
 // LOGIN / CADASTRO
 // ==========================
-
 function showRegister(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('registerScreen').style.display='flex';
@@ -42,7 +60,6 @@ function showLogin(){
   document.getElementById('loginScreen').style.display='flex';
 }
 
-// cadastro
 function register(){
   const user = document.getElementById('registerUser').value;
   const pass = document.getElementById('registerPass').value;
@@ -56,7 +73,6 @@ function register(){
   document.getElementById('registerMsg').innerText = "Conta criada!";
 }
 
-// login
 function login(){
   const user = document.getElementById('loginUser').value;
   const pass = document.getElementById('loginPass').value;
@@ -64,14 +80,15 @@ function login(){
   if(pass === localStorage.getItem('user_'+user)){
     currentUser = user;
 
+    localStorage.setItem('currentUser', user);
+
     document.getElementById('loginScreen').style.display='none';
     document.getElementById('app').style.display='block';
 
     document.getElementById('welcomeUser').innerText =
       "Seja bem-vindo, " + user + "!";
 
-    pedirPermissao(); // 🔔 pede permissão aqui
-
+    pedirPermissao();
     loadUserData();
 
     notificar("Bem-vindo 👋", "Login realizado com sucesso!");
@@ -83,7 +100,6 @@ function login(){
 // ==========================
 // DADOS
 // ==========================
-
 function save(){
   localStorage.setItem('metas_'+currentUser, JSON.stringify(metas));
   localStorage.setItem('pontos_'+currentUser, pontos);
@@ -98,8 +114,6 @@ function loadUserData(){
 // ==========================
 // METAS
 // ==========================
-
-// adicionar meta
 function addMeta(){
   const texto = document.getElementById('metaInput').value;
   const data = document.getElementById('dateInput').value;
@@ -110,11 +124,13 @@ function addMeta(){
 
   notificar("Nova meta 🎯", texto);
 
+  document.getElementById('metaInput').value = '';
+  document.getElementById('dateInput').value = '';
+
   save();
   render();
 }
 
-// marcar concluída
 function toggleMeta(i){
   metas[i].concluida = !metas[i].concluida;
 
@@ -129,7 +145,6 @@ function toggleMeta(i){
   render();
 }
 
-// editar
 function editMeta(i){
   const novo = prompt("Editar tarefa:", metas[i].texto);
 
@@ -141,7 +156,6 @@ function editMeta(i){
   }
 }
 
-// excluir
 function deleteMeta(i){
   if(confirm("Apagar tarefa?")){
     notificar("Meta removida 🗑️", metas[i].texto);
@@ -152,9 +166,8 @@ function deleteMeta(i){
 }
 
 // ==========================
-// RENDER
+// RENDER (VISUAL MELHORADO)
 // ==========================
-
 function render(){
   const list = document.getElementById('metaList');
   list.innerHTML='';
@@ -164,7 +177,9 @@ function render(){
 
     li.innerHTML = `
       <input type="checkbox" ${m.concluida?'checked':''} onclick="toggleMeta(${i})">
-      <span>${m.texto}</span>
+      <span style="${m.concluida?'text-decoration:line-through;opacity:0.6':''}">
+        ${m.texto}
+      </span>
       <button class="edit" onclick="editMeta(${i})">✏️</button>
       <button class="delete" onclick="deleteMeta(${i})">🗑️</button>
     `;
@@ -182,7 +197,6 @@ function render(){
 // ==========================
 // PROGRESSO
 // ==========================
-
 function updateProgress(){
   const total = metas.length;
   const done = metas.filter(m=>m.concluida).length;
@@ -196,7 +210,6 @@ function updateProgress(){
 // ==========================
 // RECOMPENSAS
 // ==========================
-
 function renderRewards(){
   const list = document.getElementById('rewardList');
   list.innerHTML='';
@@ -221,7 +234,6 @@ function renderRewards(){
   });
 }
 
-// resgatar
 function resgatar(i){
   const rewards = [
     {nome:'🍫 Comer algo que gosta', pontos:20},
@@ -239,3 +251,30 @@ function resgatar(i){
     render();
   }
 }
+
+// ==========================
+// ⏰ NOTIFICAÇÃO AUTOMÁTICA
+// ==========================
+function verificarMetas(){
+  const hoje = new Date();
+
+  metas.forEach(m => {
+    if(!m.data || m.concluida) return;
+
+    const dataMeta = new Date(m.data);
+
+    const diff = dataMeta - hoje;
+    const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+    if(dias === 1){
+      notificar("Meta chegando ⏰", "Amanhã: " + m.texto);
+    }
+
+    if(dias === 0){
+      notificar("Meta é hoje 🚨", m.texto);
+    }
+  });
+}
+
+// roda a cada 1 minuto
+setInterval(verificarMetas, 60000);
