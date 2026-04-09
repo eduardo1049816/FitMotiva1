@@ -10,7 +10,6 @@
 </head>
 <body>
 
-<!-- TELAS DE LOGIN/CADASTRO -->
 <div id="loginScreen" class="center fade">
   <div class="card login">
     <h2>Entrar</h2>
@@ -33,80 +32,54 @@
   </div>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none">
 <header>
+  <div class="pontos-box">⭐ <span id="pontosTopo">0</span></div>
+  <h1>🏋️ FitMotiva</h1>
+  <p id="welcomeUser"></p>
 
-<!-- ⭐ PONTOS -->
-<div class="pontos-box">
-  ⭐ <span id="pontosTopo">0</span>
-</div>
-
-<!-- BEM-VINDO -->
-<h1>🏋️ FitMotiva</h1>
-<p id="welcomeUser"></p>
-
-<!-- ⚙️ ENGRENAGEM -->
-<div class="settings-icon" onclick="toggleSettings()">⚙️</div>
-<div id="settingsMenu" class="settings-menu">
-  <h4>Idioma 🌎</h4>
-  <button onclick="setLanguage('pt')">Português</button>
-  <button onclick="setLanguage('en')">English</button>
-  <hr>
-  <h4>Conta 👤</h4>
-  <button onclick="trocarConta()">Trocar de conta</button>
-  <button onclick="logout()">Sair</button>
-</div>
-
+  <div class="settings-icon" onclick="toggleSettings()">⚙️</div>
+  <div id="settingsMenu" class="settings-menu">
+    <button onclick="logout()">Sair</button>
+  </div>
 </header>
 
-<!-- BARRA DE NÍVEL / XP -->
 <div class="nivel-box">
   Nível: <span id="nivel">1</span>
-  <div class="xp-bar">
-    <div class="xp-bar-fill" id="xpBar"></div>
-  </div>
+  <div class="xp-bar"><div class="xp-bar-fill" id="xpBar"></div></div>
   <span id="xpText">0 / 50 XP</span>
 </div>
 
 <div class="container">
 <div class="grid">
 
-<!-- NOVA META -->
 <div class="card">
-<h2>Nova Meta</h2>
-<input type="text" id="metaInput" placeholder="Ex: Fazer 20 flexões">
-<input type="date" id="dateInput">
-<button onclick="addMeta()">Adicionar</button>
-<button class="secondary" onclick="testarNotificacao()">🔔 Testar</button>
+  <h2>Nova Meta</h2>
+  <input type="text" id="metaInput">
+  <input type="date" id="dateInput">
+  <button onclick="addMeta()">Adicionar</button>
 </div>
 
-<!-- PROGRESSO -->
 <div class="card">
-<h2>Progresso</h2>
-<div class="progress">
-  <div class="progress-bar" id="progressBar"></div>
-</div>
-<p id="progressText"></p>
+  <h2>Progresso</h2>
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  <p id="progressText"></p>
 </div>
 
-<!-- METAS -->
 <div class="card">
-<h2>Metas</h2>
-<ul id="metaList"></ul>
-<p class="reward" id="rewardText"></p>
+  <h2>Metas</h2>
+  <ul id="metaList"></ul>
+  <p class="reward" id="rewardText"></p>
 </div>
 
-<!-- RECOMPENSAS -->
 <div class="card">
-<h2>Recompensas</h2>
-<ul id="rewardList"></ul>
+  <h2>Recompensas</h2>
+  <ul id="rewardList"></ul>
 </div>
 
-<!-- RANKING -->
 <div class="card ranking-box">
-<h2>🏆 Ranking</h2>
-<ul id="rankingList"></ul>
+  <h2>🏆 Ranking</h2>
+  <ul id="rankingList"></ul>
 </div>
 
 </div>
