@@ -2,28 +2,60 @@ let currentUser = null;
 let metas = [];
 let pontos = 0;
 
-// ==========================
-// 🔥 MANTER LOGIN
-// ==========================
+// AUTO LOGIN
 window.onload = function(){
   const user = localStorage.getItem('currentUser');
 
   if(user){
     currentUser = user;
-
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('app').style.display='block';
-
-    document.getElementById('welcomeUser').innerText =
-      "Seja bem-vindo, " + user + "!";
-
+    loginScreen.style.display='none';
+    app.style.display='block';
+    welcomeUser.innerText="Seja bem-vindo, "+user+"!";
     loadUserData();
   }
 }
 
-// ==========================
+// ⚙️ MENU
+function toggleSettings(){
+  const menu = document.getElementById('settingsMenu');
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+// 🌎 IDIOMA
+function setLanguage(lang){
+  const textos = {
+    pt:["Nova Meta","Progresso","Metas","Recompensas"],
+    en:["New Goal","Progress","Goals","Rewards"]
+  };
+
+  document.querySelectorAll('.card h2').forEach((el,i)=>{
+    el.innerText = textos[lang][i];
+  });
+
+  settingsMenu.style.display='none';
+}
+
+// 🔄 TROCAR CONTA
+function trocarConta(){
+  localStorage.removeItem('currentUser');
+  currentUser = null;
+
+  app.style.display = 'none';
+  loginScreen.style.display = 'flex';
+
+  loginUser.value = '';
+  loginPass.value = '';
+
+  settingsMenu.style.display='none';
+}
+
+// 🚪 LOGOUT
+function logout(){
+  localStorage.removeItem('currentUser');
+  location.reload();
+}
+
 // 🔔 NOTIFICAÇÕES
-// ==========================
 function pedirPermissao(){
   if("Notification" in window && Notification.permission !== "granted"){
     Notification.requestPermission();
@@ -32,74 +64,61 @@ function pedirPermissao(){
 
 function notificar(titulo, mensagem){
   if("Notification" in window && Notification.permission === "granted"){
-    try{
-      new Notification(titulo, {
-        body: mensagem,
-        icon: "https://cdn-icons-png.flaticon.com/512/1048/1048953.png"
-      });
-    }catch(e){
-      console.log("Notificação não suportada");
-    }
+    new Notification(titulo,{body:mensagem});
   }
 }
 
 function testarNotificacao(){
-  notificar("FitMotiva 💪", "Essa é uma notificação de teste!");
+  notificar("FitMotiva 💪","Teste!");
 }
 
-// ==========================
 // LOGIN / CADASTRO
-// ==========================
 function showRegister(){
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('registerScreen').style.display='flex';
+  loginScreen.style.display='none';
+  registerScreen.style.display='flex';
 }
 
 function showLogin(){
-  document.getElementById('registerScreen').style.display='none';
-  document.getElementById('loginScreen').style.display='flex';
+  registerScreen.style.display='none';
+  loginScreen.style.display='flex';
 }
 
 function register(){
-  const user = document.getElementById('registerUser').value;
-  const pass = document.getElementById('registerPass').value;
+  const user = registerUser.value;
+  const pass = registerPass.value;
 
   if(!user || !pass){
-    document.getElementById('registerMsg').innerText = "Preencha tudo!";
+    registerMsg.innerText="Preencha tudo!";
     return;
   }
 
   localStorage.setItem('user_'+user, pass);
-  document.getElementById('registerMsg').innerText = "Conta criada!";
+  registerMsg.innerText="Conta criada!";
 }
 
 function login(){
-  const user = document.getElementById('loginUser').value;
-  const pass = document.getElementById('loginPass').value;
+  const user = loginUser.value;
+  const pass = loginPass.value;
 
   if(pass === localStorage.getItem('user_'+user)){
     currentUser = user;
-
     localStorage.setItem('currentUser', user);
 
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('app').style.display='block';
+    loginScreen.style.display='none';
+    app.style.display='block';
 
-    document.getElementById('welcomeUser').innerText =
-      "Seja bem-vindo, " + user + "!";
+    welcomeUser.innerText="Seja bem-vindo, "+user+"!";
 
     pedirPermissao();
     loadUserData();
 
-    notificar("Bem-vindo 👋", "Login realizado com sucesso!");
+    notificar("Bem-vindo 👋","Login realizado!");
   }else{
-    document.getElementById('loginMsg').innerText="Erro no login!";
+    loginMsg.innerText="Erro no login!";
   }
 }
 
-// ==========================
 // DADOS
-// ==========================
 function save(){
   localStorage.setItem('metas_'+currentUser, JSON.stringify(metas));
   localStorage.setItem('pontos_'+currentUser, pontos);
@@ -111,46 +130,62 @@ function loadUserData(){
   render();
 }
 
-// ==========================
 // METAS
-// ==========================
 function addMeta(){
-  const texto = document.getElementById('metaInput').value;
-  const data = document.getElementById('dateInput').value;
+  const texto = metaInput.value;
+  const data = dateInput.value;
 
   if(!texto) return;
 
   metas.push({texto,data,concluida:false});
+  notificar("Nova meta 🎯",texto);
 
-  notificar("Nova meta 🎯", texto);
-
-  document.getElementById('metaInput').value = '';
-  document.getElementById('dateInput').value = '';
+  metaInput.value='';
+  dateInput.value='';
 
   save();
   render();
 }
 
+// TOGGLE META COM XP ANIMADO
 function toggleMeta(i){
   metas[i].concluida = !metas[i].concluida;
 
+  let xpGanho = 10;
+
   if(metas[i].concluida){
-    pontos += 10;
-    notificar("Meta concluída ✅", metas[i].texto);
+    addPontosAnimados(xpGanho);
+    notificar("Meta concluída ✅",metas[i].texto);
   }else{
-    pontos -= 10;
+    addPontosAnimados(-xpGanho);
   }
 
   save();
   render();
 }
 
+// ANIMAÇÃO DE PONTOS
+function addPontosAnimados(valor){
+  const duracao = 800; 
+  const passos = 20;
+  const incremento = valor / passos;
+  let cont = 0;
+
+  let anim = setInterval(()=>{
+    pontos += incremento;
+    cont++;
+    pontosTopo.innerText = Math.round(pontos);
+    updateXP();
+    if(cont>=passos) clearInterval(anim);
+  }, duracao/passos);
+}
+
+// EDITAR / DELETAR
 function editMeta(i){
   const novo = prompt("Editar tarefa:", metas[i].texto);
 
   if(novo && novo.trim() !== ''){
     metas[i].texto = novo;
-    notificar("Meta atualizada ✏️", novo);
     save();
     render();
   }
@@ -158,18 +193,15 @@ function editMeta(i){
 
 function deleteMeta(i){
   if(confirm("Apagar tarefa?")){
-    notificar("Meta removida 🗑️", metas[i].texto);
     metas.splice(i,1);
     save();
     render();
   }
 }
 
-// ==========================
-// RENDER (VISUAL MELHORADO)
-// ==========================
+// RENDER
 function render(){
-  const list = document.getElementById('metaList');
+  const list = metaList;
   list.innerHTML='';
 
   metas.forEach((m,i)=>{
@@ -189,29 +221,28 @@ function render(){
 
   updateProgress();
   renderRewards();
+  updateXP();
+  updateRanking();
 
-  document.getElementById('rewardText').innerText =
-    pontos>=50 ? '🎉 Recompensa liberada!' : 'Pontos: '+pontos;
+  rewardText.innerText =
+    pontos>=50 ? '🎉 Recompensa liberada!' : 'Pontos: '+Math.round(pontos);
+
+  pontosTopo.innerText = Math.round(pontos);
 }
 
-// ==========================
 // PROGRESSO
-// ==========================
 function updateProgress(){
   const total = metas.length;
   const done = metas.filter(m=>m.concluida).length;
   const percent = total ? (done/total)*100 : 0;
 
-  document.getElementById('progressBar').style.width = percent+'%';
-  document.getElementById('progressText').innerText =
-    Math.round(percent)+'% concluído';
+  progressBar.style.width = percent+'%';
+  progressText.innerText = Math.round(percent)+'% concluído';
 }
 
-// ==========================
 // RECOMPENSAS
-// ==========================
 function renderRewards(){
-  const list = document.getElementById('rewardList');
+  const list = rewardList;
   list.innerHTML='';
 
   const rewards = [
@@ -244,17 +275,49 @@ function resgatar(i){
 
   if(pontos >= rewards[i].pontos){
     pontos -= rewards[i].pontos;
-
     notificar("Recompensa 🎁", rewards[i].nome + " resgatada!");
-
     save();
     render();
   }
 }
 
-// ==========================
-// ⏰ NOTIFICAÇÃO AUTOMÁTICA
-// ==========================
+// XP / NÍVEL
+function updateXP(){
+  const xpParaProxNivel = 50;
+  const nivelAtual = Math.floor(pontos / xpParaProxNivel) + 1;
+  const xpAtual = pontos % xpParaProxNivel;
+
+  nivel.innerText = nivelAtual;
+  xpText.innerText = `${Math.round(xpAtual)} / ${xpParaProxNivel} XP`;
+
+  const porcentagem = (xpAtual/xpParaProxNivel)*100;
+  xpBar.style.width = porcentagem + '%';
+}
+
+// RANKING
+function updateRanking(){
+  const ranking = [];
+
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key.startsWith('pontos_')){
+      const user = key.replace('pontos_','');
+      const pts = parseInt(localStorage.getItem(key)) || 0;
+      ranking.push({user, pontos: pts});
+    }
+  }
+
+  ranking.sort((a,b)=>b.pontos - a.pontos);
+
+  rankingList.innerHTML='';
+  ranking.forEach(r=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${r.user}</span><span>⭐ ${r.pontos}</span>`;
+    rankingList.appendChild(li);
+  });
+}
+
+// NOTIFICAÇÃO DE METAS
 function verificarMetas(){
   const hoje = new Date();
 
@@ -262,19 +325,17 @@ function verificarMetas(){
     if(!m.data || m.concluida) return;
 
     const dataMeta = new Date(m.data);
-
     const diff = dataMeta - hoje;
-    const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    const dias = Math.ceil(diff / (1000*60*60*24));
 
     if(dias === 1){
-      notificar("Meta chegando ⏰", "Amanhã: " + m.texto);
+      notificar("Meta chegando ⏰","Amanhã: "+m.texto);
     }
 
     if(dias === 0){
-      notificar("Meta é hoje 🚨", m.texto);
+      notificar("Meta é hoje 🚨",m.texto);
     }
   });
 }
 
-// roda a cada 1 minuto
-setInterval(verificarMetas, 60000);
+setInterval(verificarMetas,60000);
