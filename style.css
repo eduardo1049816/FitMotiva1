@@ -10,7 +10,6 @@ body{
   color:#fff;
 }
 
-/* CENTRAL */
 .center{
   display:flex;
   justify-content:center;
@@ -26,13 +25,15 @@ body{
   padding:20px;
   box-shadow:0 8px 25px rgba(0,0,0,0.2);
   transition:0.3s;
+  min-height:260px;
+  display:flex;
+  flex-direction:column;
 }
 
 .card:hover{
   transform:translateY(-5px);
 }
 
-/* LOGIN */
 .login{
   width:300px;
   text-align:center;
@@ -42,6 +43,7 @@ body{
 header{
   text-align:center;
   padding:20px;
+  position:relative;
 }
 
 #welcomeUser{
@@ -58,8 +60,8 @@ header{
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-  gap:20px;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:25px;
 }
 
 /* INPUT */
@@ -110,21 +112,17 @@ li{
   gap:10px;
 }
 
-/* CHECKBOX MODERNO */
 input[type="checkbox"]{
   width:18px;
   height:18px;
 }
 
-/* BOTÕES */
 .edit{
   background:#2196f3;
-  color:#fff;
 }
 
 .delete{
   background:#ff5252;
-  color:#fff;
 }
 
 /* PROGRESSO */
@@ -153,4 +151,82 @@ input[type="checkbox"]{
   margin-top:10px;
   cursor:pointer;
   color:#ffd54f;
+}
+
+/* ⚙️ */
+.settings-icon{
+  position:absolute;
+  right:20px;
+  top:25px;
+  font-size:24px;
+  cursor:pointer;
+}
+
+.settings-menu{
+  position:absolute;
+  right:20px;
+  top:60px;
+  background:#1e1e2f;
+  padding:15px;
+  border-radius:10px;
+  display:none;
+  box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+
+.settings-menu button{
+  background:#ffffff20;
+}
+
+/* ⭐ PONTOS */
+.pontos-box{
+  position:absolute;
+  left:20px;
+  top:20px;
+  background: linear-gradient(135deg,#ffd54f,#ffb300);
+  color:#333;
+  padding:10px 15px;
+  border-radius:12px;
+  font-weight:bold;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* 🟢 BARRA DE NÍVEL / XP */
+.nivel-box{
+  margin:20px auto;
+  max-width:400px;
+  text-align:center;
+  font-weight:bold;
+  color:#ffd54f;
+}
+
+.xp-bar{
+  width:100%;
+  height:15px;
+  background:#ffffff30;
+  border-radius:12px;
+  overflow:hidden;
+  margin:5px 0;
+}
+
+.xp-bar-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#ffeb3b,#ffc107);
+  border-radius:12px;
+  transition: width 1s ease-in-out;
+}
+
+/* 🏆 RANKING */
+.ranking-box ul{
+  list-style:none;
+  padding:0;
+}
+
+.ranking-box li{
+  display:flex;
+  justify-content:space-between;
+  background:#ffffff20;
+  padding:10px;
+  border-radius:10px;
+  margin:5px 0;
 }
