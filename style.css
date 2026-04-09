@@ -1,232 +1,153 @@
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Poppins',sans-serif;
+let currentUser = null;
+let metas = [];
+let pontos = 0;          // VALOR REAL
+let pontosAnimados = 0;  // APENAS VISUAL
+
+window.onload = function(){
+  const user = localStorage.getItem('currentUser');
+  if(user){
+    currentUser = user;
+    loginScreen.style.display='none';
+    app.style.display='block';
+    welcomeUser.innerText="Seja bem-vindo, "+user+"!";
+    loadUserData();
+  }
 }
 
-body{
-  background: linear-gradient(135deg,#667eea,#764ba2);
-  color:#fff;
+function toggleSettings(){
+  settingsMenu.style.display =
+    settingsMenu.style.display === 'block' ? 'none' : 'block';
 }
 
-.center{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+function logout(){
+  localStorage.removeItem('currentUser');
+  location.reload();
 }
 
-/* CARDS */
-.card{
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(12px);
-  border-radius:20px;
-  padding:20px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.2);
-  transition:0.3s;
-  min-height:260px;
-  display:flex;
-  flex-direction:column;
+function showRegister(){
+  loginScreen.style.display='none';
+  registerScreen.style.display='flex';
 }
 
-.card:hover{
-  transform:translateY(-5px);
+function showLogin(){
+  registerScreen.style.display='none';
+  loginScreen.style.display='flex';
 }
 
-.login{
-  width:300px;
-  text-align:center;
+function register(){
+  if(!registerUser.value || !registerPass.value) return;
+  localStorage.setItem('user_'+registerUser.value, registerPass.value);
+  registerMsg.innerText="Conta criada!";
 }
 
-/* HEADER */
-header{
-  text-align:center;
-  padding:20px;
-  position:relative;
+function login(){
+  if(loginPass.value === localStorage.getItem('user_'+loginUser.value)){
+    currentUser = loginUser.value;
+    localStorage.setItem('currentUser', currentUser);
+    loginScreen.style.display='none';
+    app.style.display='block';
+    welcomeUser.innerText="Seja bem-vindo, "+currentUser+"!";
+    loadUserData();
+  }else{
+    loginMsg.innerText="Erro no login!";
+  }
 }
 
-#welcomeUser{
-  color:#ffd54f;
-  font-weight:600;
+function save(){
+  localStorage.setItem('metas_'+currentUser, JSON.stringify(metas));
+  localStorage.setItem('pontos_'+currentUser, pontos);
 }
 
-/* GRID */
-.container{
-  max-width:1000px;
-  margin:auto;
-  padding:15px;
+function loadUserData(){
+  metas = JSON.parse(localStorage.getItem('metas_'+currentUser)) || [];
+  pontos = parseInt(localStorage.getItem('pontos_'+currentUser)) || 0;
+  pontosAnimados = pontos;
+  render();
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:25px;
+function addMeta(){
+  if(!metaInput.value) return;
+  metas.push({texto:metaInput.value, data:dateInput.value, concluida:false});
+  metaInput.value='';
+  save();
+  render();
 }
 
-/* INPUT */
-input{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  margin-top:10px;
+function toggleMeta(i){
+  metas[i].concluida = !metas[i].concluida;
+  addPontosAnimados(metas[i].concluida ? 10 : -10);
+  save();
+  render();
 }
 
-/* BOTÕES */
-button{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  margin-top:10px;
-  background: linear-gradient(135deg,#00c853,#00e676);
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.3s;
+function addPontosAnimados(valor){
+  const inicio = pontosAnimados;
+  const fim = pontos + valor;
+  pontos += valor;
+
+  let passo = 0;
+  const passos = 20;
+
+  const anim = setInterval(()=>{
+    passo++;
+    pontosAnimados = inicio + (fim - inicio) * (passo/passos);
+    pontosTopo.innerText = Math.round(pontosAnimados);
+    updateXP();
+
+    if(passo >= passos){
+      pontosAnimados = pontos;
+      pontosTopo.innerText = pontos;
+      clearInterval(anim);
+      save();
+    }
+  }, 40);
 }
 
-button:hover{
-  transform:scale(1.03);
+function render(){
+  metaList.innerHTML='';
+  metas.forEach((m,i)=>{
+    metaList.innerHTML += `
+      <li>
+        <input type="checkbox" ${m.concluida?'checked':''} onclick="toggleMeta(${i})">
+        <span style="${m.concluida?'text-decoration:line-through;opacity:0.6':''}">
+          ${m.texto}
+        </span>
+      </li>
+    `;
+  });
+  updateProgress();
+  updateXP();
+  updateRanking();
+  pontosTopo.innerText = pontos;
 }
 
-.secondary{
-  background:#ffffff30;
+function updateProgress(){
+  const done = metas.filter(m=>m.concluida).length;
+  const percent = metas.length ? (done/metas.length)*100 : 0;
+  progressBar.style.width = percent+'%';
+  progressText.innerText = Math.round(percent)+'% concluído';
 }
 
-/* LISTA */
-ul{
-  list-style:none;
-  margin-top:10px;
+function updateXP(){
+  const xp = 50;
+  nivel.innerText = Math.floor(pontos/xp)+1;
+  xpText.innerText = `${pontos%xp} / ${xp} XP`;
+  xpBar.style.width = ((pontos%xp)/xp)*100+'%';
 }
 
-li{
-  background:#fff;
-  color:#333;
-  padding:12px;
-  border-radius:12px;
-  margin:8px 0;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-input[type="checkbox"]{
-  width:18px;
-  height:18px;
-}
-
-.edit{
-  background:#2196f3;
-}
-
-.delete{
-  background:#ff5252;
-}
-
-/* PROGRESSO */
-.progress{
-  height:12px;
-  background:#ddd;
-  border-radius:20px;
-  overflow:hidden;
-}
-
-.progress-bar{
-  height:100%;
-  background:linear-gradient(90deg,#00e676,#69f0ae);
-  width:0%;
-  transition:0.5s;
-}
-
-/* TEXTO */
-.reward{
-  margin-top:10px;
-  font-weight:bold;
-  color:#ffd54f;
-}
-
-.link{
-  margin-top:10px;
-  cursor:pointer;
-  color:#ffd54f;
-}
-
-/* ⚙️ */
-.settings-icon{
-  position:absolute;
-  right:20px;
-  top:25px;
-  font-size:24px;
-  cursor:pointer;
-}
-
-.settings-menu{
-  position:absolute;
-  right:20px;
-  top:60px;
-  background:#1e1e2f;
-  padding:15px;
-  border-radius:10px;
-  display:none;
-  box-shadow:0 5px 15px rgba(0,0,0,0.3);
-}
-
-.settings-menu button{
-  background:#ffffff20;
-}
-
-/* ⭐ PONTOS */
-.pontos-box{
-  position:absolute;
-  left:20px;
-  top:20px;
-  background: linear-gradient(135deg,#ffd54f,#ffb300);
-  color:#333;
-  padding:10px 15px;
-  border-radius:12px;
-  font-weight:bold;
-  box-shadow:0 4px 10px rgba(0,0,0,0.2);
-}
-
-/* 🟢 BARRA DE NÍVEL / XP */
-.nivel-box{
-  margin:20px auto;
-  max-width:400px;
-  text-align:center;
-  font-weight:bold;
-  color:#ffd54f;
-}
-
-.xp-bar{
-  width:100%;
-  height:15px;
-  background:#ffffff30;
-  border-radius:12px;
-  overflow:hidden;
-  margin:5px 0;
-}
-
-.xp-bar-fill{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#ffeb3b,#ffc107);
-  border-radius:12px;
-  transition: width 1s ease-in-out;
-}
-
-/* 🏆 RANKING */
-.ranking-box ul{
-  list-style:none;
-  padding:0;
-}
-
-.ranking-box li{
-  display:flex;
-  justify-content:space-between;
-  background:#ffffff20;
-  padding:10px;
-  border-radius:10px;
-  margin:5px 0;
+function updateRanking(){
+  rankingList.innerHTML='';
+  const ranking=[];
+  for(let k in localStorage){
+    if(k.startsWith('pontos_')){
+      ranking.push({
+        user:k.replace('pontos_',''),
+        pontos:parseInt(localStorage[k])
+      });
+    }
+  }
+  ranking.sort((a,b)=>b.pontos-a.pontos);
+  ranking.forEach(r=>{
+    rankingList.innerHTML+=`<li>${r.user}<span>⭐ ${r.pontos}</span></li>`;
+  });
 }
