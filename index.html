@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitMotiva</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="center fade">
+  <div class="card login slide">
+    <h2>Entrar</h2>
+    <input type="text" id="loginUser" placeholder="Usuário">
+    <input type="password" id="loginPass" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+    <p class="link" onclick="showRegister()">Criar conta</p>
+    <p id="loginMsg"></p>
+  </div>
+</div>
+
+<!-- CADASTRO -->
+<div id="registerScreen" class="center fade" style="display:none">
+  <div class="card login slide">
+    <h2>Cadastrar</h2>
+    <input type="text" id="registerUser" placeholder="Usuário">
+    <input type="password" id="registerPass" placeholder="Senha">
+    <button onclick="register()">Cadastrar</button>
+    <p class="link" onclick="showLogin()">Já tenho conta</p>
+    <p id="registerMsg"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+<header>
+<h1>🏋️ FitMotiva</h1>
+<p id="welcomeUser"></p>
+</header>
+
+<div class="container">
+<div class="grid">
+
+<!-- NOVA META -->
+<div class="card slide">
+<h2>Nova Meta</h2>
+<input type="text" id="metaInput" placeholder="Ex: Fazer 20 flexões">
+<input type="date" id="dateInput">
+<button onclick="addMeta()">Adicionar</button>
+
+<!-- BOTÃO DE TESTE DE NOTIFICAÇÃO -->
+<button onclick="testarNotificacao()">🔔 Testar Notificação</button>
+</div>
+
+<!-- PROGRESSO -->
+<div class="card slide delay1">
+<h2>Progresso</h2>
+<div class="progress">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+<p id="progressText"></p>
+</div>
+
+<!-- METAS -->
+<div class="card slide delay2">
+<h2>Metas</h2>
+<ul id="metaList"></ul>
+<p class="reward" id="rewardText"></p>
+</div>
+
+<!-- RECOMPENSAS -->
+<div class="card slide delay3">
+<h2>Recompensas</h2>
+<ul id="rewardList"></ul>
+</div>
+
+</div>
+</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
