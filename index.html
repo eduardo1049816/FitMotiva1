@@ -10,9 +10,8 @@
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="loginScreen" class="center fade">
-  <div class="card login slide">
+  <div class="card login">
     <h2>Entrar</h2>
     <input type="text" id="loginUser" placeholder="Usuário">
     <input type="password" id="loginPass" placeholder="Senha">
@@ -22,9 +21,8 @@
   </div>
 </div>
 
-<!-- CADASTRO -->
 <div id="registerScreen" class="center fade" style="display:none">
-  <div class="card login slide">
+  <div class="card login">
     <h2>Cadastrar</h2>
     <input type="text" id="registerUser" placeholder="Usuário">
     <input type="password" id="registerPass" placeholder="Senha">
@@ -34,7 +32,6 @@
   </div>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none">
 <header>
 <h1>🏋️ FitMotiva</h1>
@@ -44,19 +41,15 @@
 <div class="container">
 <div class="grid">
 
-<!-- NOVA META -->
-<div class="card slide">
+<div class="card">
 <h2>Nova Meta</h2>
 <input type="text" id="metaInput" placeholder="Ex: Fazer 20 flexões">
 <input type="date" id="dateInput">
 <button onclick="addMeta()">Adicionar</button>
-
-<!-- BOTÃO DE TESTE DE NOTIFICAÇÃO -->
-<button onclick="testarNotificacao()">🔔 Testar Notificação</button>
+<button class="secondary" onclick="testarNotificacao()">🔔 Testar</button>
 </div>
 
-<!-- PROGRESSO -->
-<div class="card slide delay1">
+<div class="card">
 <h2>Progresso</h2>
 <div class="progress">
   <div class="progress-bar" id="progressBar"></div>
@@ -64,15 +57,13 @@
 <p id="progressText"></p>
 </div>
 
-<!-- METAS -->
-<div class="card slide delay2">
+<div class="card">
 <h2>Metas</h2>
 <ul id="metaList"></ul>
 <p class="reward" id="rewardText"></p>
 </div>
 
-<!-- RECOMPENSAS -->
-<div class="card slide delay3">
+<div class="card">
 <h2>Recompensas</h2>
 <ul id="rewardList"></ul>
 </div>
